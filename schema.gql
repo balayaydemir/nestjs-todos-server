@@ -3,14 +3,14 @@
 # ------------------------------------------------------
 
 type User {
-  id: Float!
+  id: ID!
   firstName: String!
   lastName: String!
-  todos: [Todo!]
+  todos: [Todo!]!
 }
 
 type Todo {
-  id: Float!
+  id: ID!
   name: String!
   description: String!
   isCompleted: Boolean!
@@ -19,9 +19,9 @@ type Todo {
 }
 
 type Folder {
-  id: Float!
+  id: ID!
   name: String!
-  todos: [Todo!]
+  todos: [Todo!]!
 }
 
 type Query {
@@ -31,22 +31,22 @@ type Query {
 }
 
 type Mutation {
-  createTodo(input: CreateTodoDto!): Todo!
-  editTodo(input: EditTodoDto!): Todo!
+  createTodo(input: CreateTodoInput!): Todo!
+  editTodo(input: EditTodoInput!): Todo!
   deleteTodo(id: Float!): Todo!
-  createFolder(input: CreateFolderDto!): Folder!
+  createFolder(input: CreateFolderInput!): Folder!
   deleteFolder(id: Float!): Folder!
-  createUser(input: CreateUserDto!): User!
+  createUser(input: CreateUserInput!): User!
 }
 
-input CreateTodoDto {
+input CreateTodoInput {
   name: String!
   description: String!
   folderId: Float!
   userId: Float!
 }
 
-input EditTodoDto {
+input EditTodoInput {
   id: Float!
   name: String!
   description: String!
@@ -55,15 +55,16 @@ input EditTodoDto {
   userId: Float!
 }
 
-input CreateFolderDto {
+input CreateFolderInput {
   name: String!
 }
 
-input CreateUserDto {
+input CreateUserInput {
   firstName: String!
   lastName: String!
 }
 
 type Subscription {
   todoAdded(userId: Float!): Todo!
+  todoCompleted(userId: Float!): Todo!
 }

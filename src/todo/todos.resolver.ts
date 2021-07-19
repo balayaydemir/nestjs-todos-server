@@ -1,12 +1,12 @@
 import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Inject, PreconditionFailedException } from '@nestjs/common';
 import { Todo } from './todo.model'
 import { Folder } from '../folder/folder.model';
 import { TodosService } from './todos.service';
 import { FoldersService } from '../folder/folders.service';
 import { UsersService } from '../user/users.service';
-import { CreateTodoDto } from './dto/create-todo.dto';
-import { EditTodoDto } from './dto/edit-todo.dto';
+import { CreateTodoInput } from './dto/create-todo.input';
+import { EditTodoInput } from './dto/edit-todo.input';
 import { User } from '../user/user.model';
 import { PubSub } from 'graphql-subscriptions';
 
@@ -21,14 +21,15 @@ export class TodosResolver {
   ) { }
 
   @Mutation(() => Todo)
-  async createTodo(@Args('input') input: CreateTodoDto): Promise<Todo> {
+  async createTodo(@Args('input') input: CreateTodoInput): Promise<Todo> {
     const newTodo = await this.todosService.create(input)
+    if (!newTodo) throw new PreconditionFailedException()
     await pubSub.publish('todoAdded', { todoAdded: newTodo });
     return newTodo;
   }
 
   @Mutation(() => Todo)
-  async editTodo(@Args('input') input: EditTodoDto): Promise<Todo> {
+  async editTodo(@Args('input') input: EditTodoInput): Promise<Todo> {
     const editedTodo = await this.todosService.edit(input);
     if (editedTodo.isCompleted)
       await pubSub.publish('todoCompleted', { todoCompleted: editedTodo })

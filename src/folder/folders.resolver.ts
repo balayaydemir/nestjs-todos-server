@@ -3,7 +3,7 @@ import { Inject } from '@nestjs/common';
 import { Folder } from './folder.model';
 import { FoldersService } from './folders.service';
 import { TodosService } from '../todo/todos.service';
-import { CreateFolderDto } from './dto/create-folder.dto';
+import { CreateFolderInput } from './dto/create-folder.input';
 import { Todo } from '../todo/todo.model';
 
 @Resolver(() => Folder)
@@ -24,7 +24,7 @@ export class FoldersResolver {
   }
 
   @Mutation(() => Folder)
-  async createFolder(@Args('input') input: CreateFolderDto): Promise<Folder> {
+  async createFolder(@Args('input') input: CreateFolderInput): Promise<Folder> {
     return await this.foldersService.create(input);
   }
 

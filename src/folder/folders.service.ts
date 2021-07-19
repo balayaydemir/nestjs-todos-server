@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateFolderDto } from './dto/create-folder.dto';
+import { CreateFolderInput } from './dto/create-folder.input';
 import { Folder } from './folder.model'
 
 @Injectable()
@@ -11,7 +11,7 @@ export class FoldersService {
     private readonly foldersRepository: Repository<Folder>,
   ) {}
 
-  async create(createFolderDto: CreateFolderDto): Promise<Folder> {
+  async create(createFolderDto: CreateFolderInput): Promise<Folder> {
     const folder = new Folder();
     folder.name = createFolderDto.name;
 

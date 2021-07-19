@@ -3,7 +3,7 @@ import { User } from './user.model'
 import { Inject } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { TodosService } from '../todo/todos.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserInput } from './dto/create-user.input';
 import { Todo } from '../todo/todo.model';
 
 @Resolver(() => User)
@@ -19,7 +19,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  async createUser(@Args('input') input: CreateUserDto): Promise<User> {
+  async createUser(@Args('input') input: CreateUserInput): Promise<User> {
     return await this.usersService.create(input);
   }
 

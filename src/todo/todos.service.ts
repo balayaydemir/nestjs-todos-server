@@ -1,44 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, PreconditionFailedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
-import { CreateTodoDto } from './dto/create-todo.dto';
+import { Repository } from 'typeorm';
+import { CreateTodoInput } from './dto/create-todo.input';
 import { Todo } from './todo.model';
-import { FoldersService } from '../folder/folders.service';
-import { EditTodoDto } from './dto/edit-todo.dto';
-import { UsersService } from '../user/users.service';
+import { EditTodoInput } from './dto/edit-todo.input';
 
 @Injectable()
 export class TodosService {
+  logger = new Logger(TodosService.name)
   constructor(
     @InjectRepository(Todo)
     private readonly todosRepository: Repository<Todo>,
-    private foldersService: FoldersService,
-    private usersService: UsersService,
   ) {}
 
-  async create(createTodoDto: CreateTodoDto): Promise<Todo> {
-    const todo = new Todo();
-    const folder = await this.foldersService.findOne(createTodoDto.folderId);
-    const user = await this.usersService.findOne(createTodoDto.userId);
-    todo.name = createTodoDto.name;
-    todo.description = createTodoDto.description;
-    todo.folder = folder;
-    todo.user = user;
-
-    return this.todosRepository.save(todo);
+  async create(createTodoDto: CreateTodoInput): Promise<Todo> {
+    try {
+      return this.todosRepository.save({
+        name: createTodoDto.name,
+        description: createTodoDto.description,
+        folder: { id: createTodoDto.folderId },
+        user: { id: createTodoDto.userId },
+      });
+    } catch (error) {
+      this.logger.error(error)
+    }
+    return null
   }
 
-  async edit(editTodoDto: EditTodoDto): Promise<Todo> {
-    const folder = await this.foldersService.findOne(editTodoDto.id);
-    const user = await this.usersService.findOne(editTodoDto.userId)
-    await this.todosRepository.update(editTodoDto.id, {
+  async edit(editTodoDto: EditTodoInput): Promise<Todo> {
+    return this.todosRepository.save( {
+      id: editTodoDto.id,
       name: editTodoDto.name,
       description: editTodoDto.description,
       isCompleted: editTodoDto.isCompleted,
-      folder: folder,
-      user: user,
+      folder: { id: editTodoDto.folderId },
+      user: { id: editTodoDto.userId },
     });
-    return this.todosRepository.findOne(editTodoDto.id);
   }
 
   async remove(id: number): Promise<Todo> {

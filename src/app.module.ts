@@ -12,6 +12,8 @@ import { UsersModule } from './user/users.module';
     FoldersModule,
     UsersModule,
     GraphQLModule.forRoot({
+      playground: true,
+      debug: true,
       autoSchemaFile: 'schema.gql',
       installSubscriptionHandlers: true,
     }),

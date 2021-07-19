@@ -16,4 +16,7 @@ export class EditTodoDto {
 
   @Field()
   folderId: number;
+
+  @Field()
+  userId: number;
 }

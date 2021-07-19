@@ -77,13 +77,27 @@ export class CreateSchema1626655800554 implements MigrationInterface {
             referencedTableName: "folder",
             onDelete: "CASCADE"
         }));
+
+        await queryRunner.addColumn("todo", new TableColumn({
+            name: "userId",
+            type: "int"
+        }));
+
+        await queryRunner.createForeignKey("todo", new TableForeignKey({
+            columnNames: ["userId"],
+            referencedColumnNames: ["id"],
+            referencedTableName: "user",
+            onDelete: "CASCADE"
+        }));
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const table = await queryRunner.getTable("todo");
-        const foreignKey = table.foreignKeys.find(fk => fk.columnNames.indexOf("folderId") !== -1);
-        await queryRunner.dropForeignKey("todo", foreignKey);
+        const foreignKey1 = table.foreignKeys.find(fk => fk.columnNames.indexOf("folderId") !== -1);
+        const foreignKey2 = table.foreignKeys.find(fk => fk.columnNames.indexOf("userId") !== -1);
+        await queryRunner.dropForeignKeys("todo", [foreignKey1, foreignKey2]);
         await queryRunner.dropColumn("todo", "folderId");
+        await queryRunner.dropColumn("todo", "userId");
         await queryRunner.dropTable("todo");
         await queryRunner.dropTable("folder");
         await queryRunner.dropTable("user");

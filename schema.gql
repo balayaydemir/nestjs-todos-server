@@ -2,24 +2,26 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  id: Float!
+  firstName: String!
+  lastName: String!
+  todos: [Todo!]
+}
+
 type Todo {
   id: Float!
   name: String!
   description: String!
   isCompleted: Boolean!
   folder: Folder!
+  user: User!
 }
 
 type Folder {
   id: Float!
   name: String!
   todos: [Todo!]
-}
-
-type User {
-  id: Float!
-  firstName: String!
-  lastName: String!
 }
 
 type Query {
@@ -41,6 +43,7 @@ input CreateTodoDto {
   name: String!
   description: String!
   folderId: Float!
+  userId: Float!
 }
 
 input EditTodoDto {
@@ -49,6 +52,7 @@ input EditTodoDto {
   description: String!
   isCompleted: Boolean!
   folderId: Float!
+  userId: Float!
 }
 
 input CreateFolderDto {
@@ -58,4 +62,8 @@ input CreateFolderDto {
 input CreateUserDto {
   firstName: String!
   lastName: String!
+}
+
+type Subscription {
+  todoAdded(userId: Float!): Todo!
 }

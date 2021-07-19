@@ -10,4 +10,7 @@ export class CreateTodoDto {
 
   @Field()
   folderId: number;
+
+  @Field()
+  userId: number;
 }

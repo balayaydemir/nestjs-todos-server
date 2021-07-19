@@ -1,12 +1,13 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
+import { TodosModule } from '../todo/todos.module';
 import { User } from './user.model';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [forwardRef(() => TodosModule), TypeOrmModule.forFeature([User])],
   providers: [UsersService, UsersResolver],
   exports: [UsersService]
 })

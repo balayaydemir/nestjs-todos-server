@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Todo } from '../todo/todo.model';
 
 @ObjectType()
 @Entity()
@@ -15,4 +16,8 @@ export class User {
   @Field()
   @Column()
   lastName: string;
+
+  @Field(() => [Todo], { nullable: true })
+  @OneToMany(() => Todo, todo => todo.user, { onDelete: "CASCADE" })
+  todos: Todo[];
 }

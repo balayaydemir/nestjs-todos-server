@@ -1,0 +1,61 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Todo {
+  id: Float!
+  name: String!
+  description: String!
+  isCompleted: Boolean!
+  folder: Folder!
+}
+
+type Folder {
+  id: Float!
+  name: String!
+  todos: [Todo!]
+}
+
+type User {
+  id: Float!
+  firstName: String!
+  lastName: String!
+}
+
+type Query {
+  getFolder(id: Float!): Folder!
+  getAllFolders: [Folder!]!
+  user(id: Float!): User!
+}
+
+type Mutation {
+  createTodo(input: CreateTodoDto!): Todo!
+  editTodo(input: EditTodoDto!): Todo!
+  deleteTodo(id: Float!): Todo!
+  createFolder(input: CreateFolderDto!): Folder!
+  deleteFolder(id: Float!): Folder!
+  createUser(input: CreateUserDto!): User!
+}
+
+input CreateTodoDto {
+  name: String!
+  description: String!
+  folderId: Float!
+}
+
+input EditTodoDto {
+  id: Float!
+  name: String!
+  description: String!
+  isCompleted: Boolean!
+  folderId: Float!
+}
+
+input CreateFolderDto {
+  name: String!
+}
+
+input CreateUserDto {
+  firstName: String!
+  lastName: String!
+}

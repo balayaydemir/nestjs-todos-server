@@ -29,7 +29,10 @@ export class TodosResolver {
 
   @Mutation(() => Todo)
   async editTodo(@Args('input') input: EditTodoDto): Promise<Todo> {
-    return await this.todosService.edit(input);
+    const editedTodo = await this.todosService.edit(input);
+    if (editedTodo.isCompleted)
+      await pubSub.publish('todoCompleted', { todoCompleted: editedTodo })
+    return editedTodo;
   }
 
   @Mutation(() => Todo)
@@ -56,5 +59,14 @@ export class TodosResolver {
   })
   addTodoHandler(@Args('userId') userId: number) {
     return pubSub.asyncIterator('todoAdded');
+  }
+
+  @Subscription(() => Todo, {
+    name: 'todoCompleted',
+    filter: (payload, variables) =>
+      payload.todoAdded.user.id !== variables.userId,
+  })
+  completeTodoHandler(@Args('userId') userId: number) {
+    return pubSub.asyncIterator('todoCompleted')
   }
 }

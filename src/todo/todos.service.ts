@@ -28,27 +28,42 @@ export class TodosService {
   }
 
   async edit(editTodoDto: EditTodoInput): Promise<Todo> {
-    return this.todosRepository.save( {
-      id: editTodoDto.id,
-      name: editTodoDto.name,
-      description: editTodoDto.description,
-      isCompleted: editTodoDto.isCompleted,
-      folder: { id: editTodoDto.folderId },
-      user: { id: editTodoDto.userId },
-    });
+    try {
+      return this.todosRepository.save( {
+        id: editTodoDto.id,
+        name: editTodoDto.name,
+        description: editTodoDto.description,
+        isCompleted: editTodoDto.isCompleted,
+        folder: { id: editTodoDto.folderId },
+        user: { id: editTodoDto.userId },
+      });
+    } catch (error) {
+      this.logger.error(error)
+    }
+    return null
   }
 
   async remove(id: number): Promise<Todo> {
-    const folderToDelete = await this.todosRepository.findOne(id);
-    await this.todosRepository.delete(id);
-    return folderToDelete;
+    try {
+      const folderToDelete = await this.todosRepository.findOne(id);
+      await this.todosRepository.delete(id);
+      return folderToDelete;
+    } catch (error) {
+      this.logger.error(error)
+    }
+    return null
   }
 
   async findByFolder(id: number): Promise<Todo[]> {
-    return this.todosRepository
-      .createQueryBuilder('todo')
-      .where('todo.folder = :id', { id })
-      .getMany();
+    try {
+      return this.todosRepository
+        .createQueryBuilder('todo')
+        .where('todo.folder = :id', { id })
+        .getMany();
+    } catch (error) {
+      this.logger.error(error)
+    }
+    return null
   }
 
   async findByUser(id: number): Promise<Todo[]> {

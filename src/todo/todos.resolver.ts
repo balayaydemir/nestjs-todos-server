@@ -31,6 +31,7 @@ export class TodosResolver {
   @Mutation(() => Todo)
   async editTodo(@Args('input') input: EditTodoInput): Promise<Todo> {
     const editedTodo = await this.todosService.edit(input);
+    if (!editedTodo) throw new PreconditionFailedException()
     if (editedTodo.isCompleted)
       await pubSub.publish('todoCompleted', { todoCompleted: editedTodo })
     return editedTodo;
@@ -38,7 +39,9 @@ export class TodosResolver {
 
   @Mutation(() => Todo)
   async deleteTodo(@Args('id') id: number): Promise<Todo> {
-    return await this.todosService.remove(id);
+    const deletedTodo = await this.todosService.remove(id);
+    if (!deletedTodo) throw new PreconditionFailedException()
+    return deletedTodo
   }
 
   @ResolveField(() => Folder)

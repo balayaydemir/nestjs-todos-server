@@ -1,5 +1,5 @@
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { Inject } from '@nestjs/common';
+import { Inject, PreconditionFailedException } from '@nestjs/common';
 import { Folder } from './folder.model';
 import { FoldersService } from './folders.service';
 import { TodosService } from '../todo/todos.service';
@@ -15,22 +15,30 @@ export class FoldersResolver {
 
   @Query(() => Folder)
   async getFolder(@Args('id') id: number): Promise<Folder> {
-    return await this.foldersService.findOne(id);
+    const folder = await this.foldersService.findOne(id);
+    if (!folder) throw new PreconditionFailedException()
+    return folder
   }
 
   @Query(() => [Folder])
   async getAllFolders(): Promise<Folder[]> {
-    return await this.foldersService.findAll();
+    const folders = await this.foldersService.findAll();
+    if (!folders) throw new PreconditionFailedException()
+    return folders
   }
 
   @Mutation(() => Folder)
   async createFolder(@Args('input') input: CreateFolderInput): Promise<Folder> {
-    return await this.foldersService.create(input);
+    const folder = await this.foldersService.create(input);
+    if (!folder) throw new PreconditionFailedException()
+    return folder
   }
 
   @Mutation(() => Folder)
   async deleteFolder(@Args('id') id: number): Promise<Folder> {
-    return await this.foldersService.remove(id);
+    const deleted = await this.foldersService.remove(id);
+    if (!deleted) throw new PreconditionFailedException()
+    return deleted
   }
 
   @ResolveField(() => [Todo])

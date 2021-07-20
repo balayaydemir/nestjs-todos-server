@@ -32,8 +32,7 @@ export class TodosResolver {
   async editTodo(@Args('input') input: EditTodoInput): Promise<Todo> {
     const editedTodo = await this.todosService.edit(input);
     if (!editedTodo) throw new PreconditionFailedException()
-    if (editedTodo.isCompleted)
-      await pubSub.publish('todoCompleted', { todoCompleted: editedTodo })
+    await pubSub.publish('todoEdited', { todoEdited: editedTodo })
     return editedTodo;
   }
 
@@ -41,6 +40,7 @@ export class TodosResolver {
   async deleteTodo(@Args('id') id: number): Promise<Todo> {
     const deletedTodo = await this.todosService.remove(id);
     if (!deletedTodo) throw new PreconditionFailedException()
+    await pubSub.publish('todoDeleted', { todoDeleted: deletedTodo })
     return deletedTodo
   }
 
@@ -57,6 +57,13 @@ export class TodosResolver {
   }
 
   @Subscription(() => Todo, {
+    name: 'todoDeleted'
+  })
+  deleteTodoHandler() {
+    return pubSub.asyncIterator('todoDeleted');
+  }
+
+  @Subscription(() => Todo, {
     name: 'todoAdded',
     filter: (payload, variables) =>
       payload.todoAdded.user.id !== variables.userId,
@@ -66,11 +73,11 @@ export class TodosResolver {
   }
 
   @Subscription(() => Todo, {
-    name: 'todoCompleted',
+    name: 'todoEdited',
     filter: (payload, variables) =>
-      payload.todoAdded.user.id !== variables.userId,
+      payload.todoEdited.user.id !== variables.userId,
   })
-  completeTodoHandler(@Args('userId') userId: number) {
-    return pubSub.asyncIterator('todoCompleted')
+  editTodoHandler(@Args('userId') userId: number) {
+    return pubSub.asyncIterator('todoEdited')
   }
 }

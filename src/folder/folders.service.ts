@@ -14,7 +14,7 @@ export class FoldersService {
 
   async create(createFolderDto: CreateFolderInput): Promise<Folder> {
     try {
-      return this.foldersRepository.save({ name: createFolderDto.name });
+      return this.foldersRepository.save({ name: createFolderDto.name, user: { id: createFolderDto.userId } });
     } catch (error) {
       this.logger.error(error)
     }

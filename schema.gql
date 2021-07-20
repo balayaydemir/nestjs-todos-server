@@ -57,6 +57,7 @@ input EditTodoInput {
 
 input CreateFolderInput {
   name: String!
+  userId: Float!
 }
 
 input CreateUserInput {
@@ -65,6 +66,9 @@ input CreateUserInput {
 }
 
 type Subscription {
+  todoDeleted: Todo!
   todoAdded(userId: Float!): Todo!
-  todoCompleted(userId: Float!): Todo!
+  todoEdited(userId: Float!): Todo!
+  folderDeleted: Folder!
+  folderAdded(userId: Float!): Folder!
 }

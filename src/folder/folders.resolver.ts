@@ -1,10 +1,13 @@
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { Inject, PreconditionFailedException } from '@nestjs/common';
 import { Folder } from './folder.model';
 import { FoldersService } from './folders.service';
 import { TodosService } from '../todo/todos.service';
 import { CreateFolderInput } from './dto/create-folder.input';
 import { Todo } from '../todo/todo.model';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Resolver(() => Folder)
 export class FoldersResolver {
@@ -31,6 +34,7 @@ export class FoldersResolver {
   async createFolder(@Args('input') input: CreateFolderInput): Promise<Folder> {
     const folder = await this.foldersService.create(input);
     if (!folder) throw new PreconditionFailedException()
+    await pubSub.publish('folderAdded', { folderAdded: folder })
     return folder
   }
 
@@ -38,6 +42,7 @@ export class FoldersResolver {
   async deleteFolder(@Args('id') id: number): Promise<Folder> {
     const deleted = await this.foldersService.remove(id);
     if (!deleted) throw new PreconditionFailedException()
+    await pubSub.publish('folderDeleted', { folderDeleted: deleted })
     return deleted
   }
 
@@ -45,5 +50,22 @@ export class FoldersResolver {
   async todos(@Parent() folder) {
     const { id } = folder;
     return this.todosService.findByFolder(id);
+  }
+
+  @Subscription(() => Folder, {
+    name: 'folderDeleted'
+  })
+  deleteFolderHandler() {
+    return pubSub.asyncIterator('folderDeleted');
+  }
+
+  @Subscription(() => Folder, {
+    name: 'folderAdded',
+    filter: (payload, variables) => {
+      return payload.folderAdded.user.id !== variables.userId
+    }
+  })
+  addFolderHandler(@Args('userId') userId: number) {
+    return pubSub.asyncIterator('folderAdded');
   }
 }
